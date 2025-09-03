@@ -3,10 +3,8 @@
 # Replaces matplotlib with better performance and aesthetics
 
 import pygame
-import pygame.gfxdraw
 import numpy as np
-import math
-from typing import List, Tuple, Optional, Dict
+from typing import List, Tuple
 from dataclasses import dataclass
 
 # Color scheme (matching the original)
