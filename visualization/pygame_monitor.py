@@ -62,8 +62,8 @@ class PygameMonitor:
         pygame.init()
         
         # Display settings - much larger for better grid visibility
-        self.width = 1800
-        self.height = 1200
+        self.width = 1920
+        self.height = 1000
         self.screen = pygame.display.set_mode((self.width, self.height))
         pygame.display.set_caption("Civilization Simulation - Pygame Monitor")
         
