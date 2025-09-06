@@ -4,7 +4,7 @@
 from simulation.config import CFG
 from simulation.sim import Sim
 from simulation.charts import final_charts
-from visualization.pygame_monitor import PygameMonitor
+from visualization.pygame.monitor import PygameMonitor
 
 
 def run():
