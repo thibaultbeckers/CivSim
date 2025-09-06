@@ -1,6 +1,4 @@
-# main.py
-# Entry point for running the simulation with pygame visualization
-
+import time
 from simulation.config import CFG
 from simulation.sim import Sim
 from simulation.charts import final_charts
@@ -10,60 +8,64 @@ from visualization.pygame.monitor import PygameMonitor
 def run():
     cfg = CFG()
     sim = Sim(cfg)
-    ui = PygameMonitor(sim, cfg)
+    monitor = PygameMonitor(sim, cfg)
 
-    ticks_total = cfg.N_DAYS * cfg.T_DAY
     tcount = 0
+    last_tick_time = time.time()
 
     try:
         for day in range(cfg.N_DAYS):
-            for t in range(cfg.T_DAY):
-                # Check if simulation should stop
-                if ui.should_stop:
-                    print("Simulation stopped by user")
-                    final_charts(sim)
-                    return
+            t = 0
+            while t < cfg.T_DAY:
+                now = time.time()
+                tick_interval = 1.0 / monitor.ticks_per_second if monitor.ticks_per_second > 0 else float("inf")
 
-                # Check if simulation is paused
-                while ui.is_paused and not ui.should_stop:
-                    if not ui.render(day, t):
+                # only advance sim if enough time has passed
+                if now - last_tick_time >= tick_interval:
+                    last_tick_time += tick_interval
+
+                    # stop / pause checks
+                    if monitor.should_stop:
+                        print("Simulation stopped by user")
+                        final_charts(sim)
+                        return
+                    while monitor.is_paused and not monitor.should_stop:
+                        if not monitor.render(day, t):
+                            return
+                    if monitor.should_stop:
+                        print("Simulation stopped by user")
+                        final_charts(sim)
                         return
 
-                # Check again after unpausing
-                if ui.should_stop:
-                    print("Simulation stopped by user")
-                    final_charts(sim)
+                    # simulation tick
+                    sim.upkeep()
+                    if not sim.agents:
+                        monitor.render(day, t)
+                        break
+                    sim.decide_and_move()
+                    if not sim.agents:
+                        monitor.render(day, t)
+                        break
+                    sim.forage()
+                    sim.combat()
+                    sim.world.spawn_carrots()
+
+                    t += 1
+                    tcount += 1
+
+                # always render monitor
+                if not monitor.render(day, t):
                     return
 
-                sim.upkeep()
-                if not sim.agents:
-                    ui.render(day, t)
-                    break  # extinction
-                sim.decide_and_move()
-                if not sim.agents:
-                    ui.render(day, t)
-                    break
-                sim.forage()
-                sim.combat()
-                sim.world.spawn_carrots()
-
-                if (t % cfg.RENDER_EVERY) == 0:
-                    if not ui.render(day, t):
-                        return
-                tcount += 1
-
-            # Night phase (instant)
             sim.night_phase(day)
             sim.record_day_metrics()
 
-        # End-of-sim charts
-        if not ui.should_stop:
+        if not monitor.should_stop:
             print("Simulation completed normally")
         final_charts(sim)
 
     finally:
-        # Always cleanup pygame
-        ui.cleanup()
+        monitor.cleanup()
 
 
 if __name__ == "__main__":

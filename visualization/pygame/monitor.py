@@ -52,6 +52,7 @@ class PygameMonitor:
         # FPS control
         self.fps_clock = pygame.time.Clock()
         self.fps = 60
+        self.ticks_per_second = 1
 
     # ---------- Initialization helpers ----------
 
@@ -68,22 +69,39 @@ class PygameMonitor:
     def _init_buttons(self):
         button_width, button_height = 120, 40
         button_y = self.height - 60
+        center_x = self.width // 2
+
         return {
             "pause_play": {
-                "rect": pygame.Rect(self.width // 2 - button_width - 20, button_y, button_width, button_height),
+                "rect": pygame.Rect(center_x - button_width - 20, button_y, button_width, button_height),
                 "text": "⏸ Pause",
                 "color": COLORS["UI_BUTTON"],
                 "hover_color": COLORS["UI_BUTTON_HOVER"],
                 "action": "toggle_pause",
             },
             "stop": {
-                "rect": pygame.Rect(self.width // 2 + 20, button_y, button_width, button_height),
+                "rect": pygame.Rect(center_x + 20, button_y, button_width, button_height),
                 "text": "⏹ Stop",
                 "color": COLORS["UI_STOP"],
                 "hover_color": (255, 150, 150),
                 "action": "stop",
             },
+            "faster": {
+                "rect": pygame.Rect(center_x + 180, button_y, button_width, button_height),
+                "text": "⏩ Faster",
+                "color": COLORS["UI_BUTTON"],
+                "hover_color": COLORS["UI_BUTTON_HOVER"],
+                "action": "speed_up",
+            },
+            "slower": {
+                "rect": pygame.Rect(center_x - 180 - button_width, button_y, button_width, button_height),
+                "text": "⏪ Slower",
+                "color": COLORS["UI_BUTTON"],
+                "hover_color": COLORS["UI_BUTTON_HOVER"],
+                "action": "slow_down",
+            },
         }
+
 
     def _init_legend(self):
         legend_x, legend_y, legend_width = self.grid_x + self.grid_size + 20, 50, 250

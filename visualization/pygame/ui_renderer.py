@@ -67,6 +67,10 @@ def draw_status(monitor):
     events_text = f"Today: Fights {monitor.sim.fights_today} | Deaths {monitor.sim.deaths_today} | Births {monitor.sim.births_today}"
     monitor.screen.blit(monitor.fonts['small'].render(events_text, True, COLORS['UI_TEXT']), (status_x + 10, status_y + y_offset + 20))
 
+    speed_text = f"Speed: {monitor.fps} FPS"
+    surf = monitor.fonts['small'].render(speed_text, True, COLORS['UI_TEXT'])
+    monitor.screen.blit(surf, (status_x + 10, status_y + y_offset + 40))
+
 
 def draw_live_counters(monitor):
     counter_rect = pygame.Rect(monitor.grid_x, 20, monitor.grid_size, 40)

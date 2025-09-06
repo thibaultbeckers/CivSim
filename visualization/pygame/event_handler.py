@@ -21,14 +21,22 @@ def handle_events(monitor):
             monitor.mouse_pos = event.pos
     return True
 
+
 def _handle_click(monitor, pos):
     for button in monitor.buttons.values():
         if button['rect'].collidepoint(pos):
-            if button['action'] == 'toggle_pause':
+            action = button['action']
+            if action == "toggle_pause":
                 _toggle_pause(monitor)
-            elif button['action'] == 'stop':
+            elif action == "stop":
                 _stop_simulation(monitor)
-            break
+            elif action == "speed_up":
+                monitor.ticks_per_second = min(monitor.ticks_per_second * 2, 60.0)
+                print(f"Simulation speed: {monitor.ticks_per_second:.1f} ticks/sec")
+            elif action == "slow_down":
+                monitor.ticks_per_second = max(monitor.ticks_per_second / 2, 0.125)
+                print(f"Simulation speed: {monitor.ticks_per_second:.3f} ticks/sec")
+
 
 def _toggle_pause(monitor):
     monitor.is_paused = not monitor.is_paused
@@ -38,6 +46,7 @@ def _toggle_pause(monitor):
     else:
         monitor.buttons['pause_play']['text'] = '⏸ Pause'
         monitor.buttons['pause_play']['color'] = COLORS['UI_BUTTON']
+
 
 def _stop_simulation(monitor):
     monitor.should_stop = True
